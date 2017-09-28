@@ -8,8 +8,7 @@ podTemplate(label: 'docker',
 
   node('docker') {
     checkout scm
-    def commit = env['GIT_COMMIT']
-    def shortCommit = commit[0..6]
+    def shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
 
     stage('Build & Test .NET Application') {
       container('dotnet') {
