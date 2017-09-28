@@ -13,6 +13,7 @@ podTemplate(label: 'docker',
     stage('Build & Test .NET Application') {
       container('dotnet') {
         sh "dotnet restore"
+        sh "dotnet test test/**/*.csproj"
         sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
       }
     }
