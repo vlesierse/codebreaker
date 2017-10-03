@@ -5,20 +5,28 @@ namespace CodeBreaker.Core
 {
     public class Game
     {
-        public Game(Code code)
+        public Game(GameOptions options)
         {
             Id = Guid.NewGuid();
-            Code = code;
+            Code = Code.Generate(options.Digits, options.MinValue, options.MaxValue);
+            Options = options;
             Attempts = new List<CodeResult>();
+            CreatedAt = DateTimeOffset.UtcNow;
         }
 
         public Guid Id { get; set; }
         public Code Code { get; set; }
+        public GameOptions Options { get; set; }
         public ICollection<CodeResult> Attempts { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? FinishedAt { get; set; }
         public CodeResult EnterCode(Code code)
         {
             var result = Code.Match(code);
             Attempts.Add(result);
+            if (result.Correct) {
+                FinishedAt = DateTimeOffset.UtcNow;
+            }
             return result;
         }
     }

@@ -17,6 +17,7 @@ namespace CodeBreaker.WebApp.Contracts
         }
 
         public Guid Id => _game.Id;
+        public GameOptions Options => _game.Options;
         public IEnumerable<CodeResult> Attempts => _game.Attempts;
     }
 }

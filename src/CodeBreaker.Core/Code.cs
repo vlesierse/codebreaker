@@ -78,11 +78,11 @@ namespace CodeBreaker.Core
             return result;
         }
 
-        public static Code Generate(int positions, int minValue, int maxValue)
+        public static Code Generate(int digits, int minValue, int maxValue)
         {
-            var code = new int[positions];
+            var code = new int[digits];
             var random = new Random();
-            for(int i = 0; i < positions; i++)
+            for(int i = 0; i < digits; i++)
             {
                 code[i] = random.Next(minValue, maxValue);
             }

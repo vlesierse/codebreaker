@@ -1,9 +1,30 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
+import { actionCreators } from '../store';
 
-export default class Game extends React.Component {
+import CodePanel from './CodePanel';
+import AttemptList from './AttemptList';
+
+class Game extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    handleCodeEnter = (code) => {
+        this.props.enterCode(code);
+    }
+    handleStartGame = () => {
+        this.props.startGame();
+    }
     render() {
-        return <div>
-            <h1>Welcome</h1>
-        </div>;
+        let startView = (<div>
+            <button onClick={this.handleStartGame}>Start Game</button>
+        </div>);
+        let gameView = (<div>
+            <CodePanel onCodeEnter={this.handleCodeEnter} digits={this.props.options.digits} minValue={this.props.options.minValue} maxValue={this.props.options.maxValue} />
+            <AttemptList attempts={this.props.attempts} />
+        </div>);
+        return this.props.id ? gameView : startView;
     }
 }
+
+export default connect((state) => state.game, actionCreators.game)(Game);
