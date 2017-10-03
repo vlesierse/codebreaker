@@ -4,6 +4,7 @@ import { Container, Button } from 'semantic-ui-react'
 import { actionCreators } from '../store';
 
 import CodePanel from './CodePanel';
+import ScorePanel from './ScorePanel';
 import AttemptList from './AttemptList';
 
 class Game extends React.Component {
@@ -24,7 +25,11 @@ class Game extends React.Component {
             <CodePanel onCodeEnter={this.handleCodeEnter} digits={this.props.options.digits} minValue={this.props.options.minValue} maxValue={this.props.options.maxValue} />
             <AttemptList attempts={this.props.attempts} />
         </Container>);
-        return this.props.id ? gameView : startView;
+        let finishedGame = (<Container>
+            <ScorePanel score={this.props.score}/>
+            <Button onClick={this.handleStartGame}>Start Game</Button>
+        </Container>);
+        return this.props.id ? (this.props.score ? finishedGame : gameView) : startView;
     }
 }
 

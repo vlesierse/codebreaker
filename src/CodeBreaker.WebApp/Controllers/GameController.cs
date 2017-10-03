@@ -2,6 +2,7 @@ using System;
 using CodeBreaker.Core;
 using CodeBreaker.WebApp.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CodeBreaker.WebApp.Controllers
 {
@@ -9,9 +10,11 @@ namespace CodeBreaker.WebApp.Controllers
     public class GameController : Controller
     {
         private readonly IGameManager _gameManager;
-        public GameController(IGameManager gameManager)
+        private readonly ILogger _logger;
+        public GameController(IGameManager gameManager, ILoggerFactory loggerFactory)
         {
             _gameManager = gameManager;
+            _logger = loggerFactory.CreateLogger<GameController>();
         }
 
         [HttpGet("{id}")]
@@ -22,6 +25,7 @@ namespace CodeBreaker.WebApp.Controllers
             {
                 return NotFound();
             }
+            _logger.LogInformation($"Game {game.Id} created: Code [{game.Code}]");
             return Ok(new GameResult(game));
         }
 
@@ -45,13 +49,14 @@ namespace CodeBreaker.WebApp.Controllers
 
             var result = game.EnterCode(new Code(code));
             _gameManager.SaveGame(game);
-            return Ok(result);
+            return Ok(new EnterCodeResult(result, game));
         }
 
         [HttpPost]
         public IActionResult Create()
         {
             var game = _gameManager.NewGame();
+            _logger.LogInformation($"Game {game.Id} created: Code [{game.Code}]");
             return CreatedAtAction("Get", new { id = game.Id }, new GameResult(game));
         }
     }

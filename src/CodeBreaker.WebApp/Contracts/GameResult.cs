@@ -17,6 +17,9 @@ namespace CodeBreaker.WebApp.Contracts
         }
 
         public Guid Id => _game.Id;
+        public DateTimeOffset CreatedAt => _game.CreatedAt;
+        public DateTimeOffset? FinishedAt => _game.FinishedAt;
+        public Score Score => _game.Score;
         public GameOptions Options => _game.Options;
         public IEnumerable<CodeResult> Attempts => _game.Attempts;
     }

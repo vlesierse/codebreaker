@@ -78,6 +78,11 @@ namespace CodeBreaker.Core
             return result;
         }
 
+        public override string ToString()
+        {
+            return String.Join(",", Digits);
+        }
+
         public static Code Generate(int digits, int minValue, int maxValue)
         {
             var code = new int[digits];

@@ -26,6 +26,7 @@ module.exports = (env) => {
                 'redux',
                 'redux-thunk',
                 'react-router-redux',
+                'semantic-ui-react'
             ],
         },
         output: {
