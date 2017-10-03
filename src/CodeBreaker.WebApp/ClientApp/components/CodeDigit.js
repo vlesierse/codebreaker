@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Button, Form } from 'semantic-ui-react'
 
 export default class CodeDigit extends React.Component {
     constructor(props) {
@@ -11,6 +12,8 @@ export default class CodeDigit extends React.Component {
         this.props.onChange(digit, this, event);
     }
     render() {
-        return (<input value={this.state.digit || ''} onChange={this.handleChange} />);
+        return (<Form.Field width='1'>
+            <input value={this.state.digit || ''} onChange={this.handleChange} />
+        </Form.Field>);
     }
 };

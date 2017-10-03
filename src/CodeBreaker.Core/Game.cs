@@ -20,12 +20,15 @@ namespace CodeBreaker.Core
         public ICollection<CodeResult> Attempts { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? FinishedAt { get; set; }
+        public Score Score { get; set; }
+        public int? Duration => (int)FinishedAt?.Subtract(CreatedAt).TotalSeconds;
         public CodeResult EnterCode(Code code)
         {
             var result = Code.Match(code);
             Attempts.Add(result);
             if (result.Correct) {
                 FinishedAt = DateTimeOffset.UtcNow;
+                Score = new Score(Id, Attempts.Count, Duration.Value);
             }
             return result;
         }

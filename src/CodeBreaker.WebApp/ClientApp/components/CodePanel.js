@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Button, Form } from 'semantic-ui-react'
 
 import CodeDigit from './CodeDigit';
 
@@ -22,10 +23,12 @@ export default class CodePanel extends React.Component {
         this.props.onCodeEnter(this.state.code);
     }
     render() {
-        console.log(this.state);
-        return (<div>
-            {this.state.code.map((d, i) => (<CodeDigit id={i} key={i} digit={d} onChange={this.handleDigitChanged} />))}
-            <button onClick={this.handleEnterCode} disabled={!this.state.isValid}>Enter</button>
-        </div>);
+        return (
+        <Form>
+            <Form.Group widths='equal'>
+                {this.state.code.map((d, i) => (<CodeDigit id={i} key={i} digit={d} onChange={this.handleDigitChanged} />))}
+                <Button circular icon='play' color='green' onClick={this.handleEnterCode} disabled={!this.state.isValid} />
+            </Form.Group>
+        </Form>);
     }
 };

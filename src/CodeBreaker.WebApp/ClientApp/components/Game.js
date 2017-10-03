@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Container, Button } from 'semantic-ui-react'
 import { actionCreators } from '../store';
 
 import CodePanel from './CodePanel';
@@ -16,13 +17,13 @@ class Game extends React.Component {
         this.props.startGame();
     }
     render() {
-        let startView = (<div>
-            <button onClick={this.handleStartGame}>Start Game</button>
-        </div>);
-        let gameView = (<div>
+        let startView = (<Container>
+            <Button onClick={this.handleStartGame}>Start Game</Button>
+        </Container>);
+        let gameView = (<Container>
             <CodePanel onCodeEnter={this.handleCodeEnter} digits={this.props.options.digits} minValue={this.props.options.minValue} maxValue={this.props.options.maxValue} />
             <AttemptList attempts={this.props.attempts} />
-        </div>);
+        </Container>);
         return this.props.id ? gameView : startView;
     }
 }
