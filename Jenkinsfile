@@ -36,15 +36,17 @@ pipeline {
     stage('Publish Docker image') {
       when { branch 'master' }
       steps {
-        container('dotnet') {
-          sh 'dotnet publish -o ./out/ -c Release --self-contained -r linux-x64'
-        }
-        container('docker') {
-          docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
-            sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
-            def image = docker.image("codebreaker:${shortCommit}")
-            image.push()
-            image.push('latest')
+        script {
+          container('dotnet') {
+            sh 'dotnet publish -o ./out/ -c Release --self-contained -r linux-x64'
+          }
+          container('docker') {
+            docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
+              sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
+              def image = docker.image("codebreaker:${shortCommit}")
+              image.push()
+              image.push('latest')
+            }
           }
         }
       }
