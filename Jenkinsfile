@@ -18,28 +18,28 @@ podTemplate(label: 'docker',
       }
     }
     stage('Build & Publish Docker image') {
-      when { branch 'master' }
+      //when { branch 'master' }
       steps {
         container('dotnet') {
           sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
         }
-        container('docker') {
+        /*container('docker') {
           docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
             sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
             def image = docker.image("codebreaker:${shortCommit}")
             image.push()
             image.push('latest')
           }
-        }
+        }*/
       }
     }
-    stage('Deploy application') {
+    /*stage('Deploy application') {
       when { branch 'master' }
       steps {
         container('cloudio') {
           sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
         }
       }
-    }
+    }*/
   }
 }

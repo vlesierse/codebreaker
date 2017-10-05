@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}/codebreaker.sln"
+                "${workspaceFolder}/codebreaker.sln"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
