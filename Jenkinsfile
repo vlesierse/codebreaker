@@ -15,22 +15,18 @@ podTemplate(label: 'docker',
       container('dotnet') {
         sh "dotnet restore"
         sh "dotnet test test/**/*.csproj"
+        sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
       }
     }
     stage('Build & Publish Docker image') {
       when { branch 'master' }
       steps {
-        script {
-          container('dotnet') {
-            sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
-          }
-          container('docker') {
-            docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
-              sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
-              def image = docker.image("codebreaker:${shortCommit}")
-              image.push()
-              image.push('latest')
-            }
+        container('docker') {
+          docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
+            sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
+            def image = docker.image("codebreaker:${shortCommit}")
+            image.push()
+            image.push('latest')
           }
         }
       }
@@ -38,10 +34,8 @@ podTemplate(label: 'docker',
     stage('Deploy application') {
       when { branch 'master' }
       steps {
-        script {
-          container('cloudio') {
-            sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
-          }
+        container('cloudio') {
+          sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
         }
       }
     }
