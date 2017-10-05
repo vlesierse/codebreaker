@@ -25,17 +25,19 @@ pipeline {
   stages {
     stage('Build & Test .NET Application') {
       steps {
-        container('dotnet') {
-          sh 'dotnet restore'
-          sh 'dotnet test test/**/*.csproj'
+        script {
+          container('dotnet') {
+            sh 'dotnet restore'
+            sh 'dotnet test test/**/*.csproj'
+          }
         }
       }
     }
-    stage('Build & Publish Docker image') {
+    stage('Publish Docker image') {
       when { branch 'master' }
       steps {
         container('dotnet') {
-          sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
+          sh 'dotnet publish -o ./out/ -c Release --self-contained -r linux-x64'
         }
         container('docker') {
           docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
