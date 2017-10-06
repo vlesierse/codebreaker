@@ -18,7 +18,7 @@ podTemplate(label: 'kubernetes',
         //sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
       }
     }
-    /*stage('Build Docker image') {
+    /*stage('Build & Publish Docker image') {
       container('docker') {
         docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
           sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
@@ -28,10 +28,15 @@ podTemplate(label: 'kubernetes',
         }
       }
     }*/
-    stage('Deploy application') {
+    stage('Deploy') {
       when { branch 'master' }
       steps {
-        echo 'This stage will be executed first.'
+        echo 'This stage will be skiped'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        echo 'This stage will be executed.'
       }
     }
   }
