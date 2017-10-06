@@ -2,7 +2,8 @@ podTemplate(label: 'kubernetes',
   containers: [
     containerTemplate(name: 'docker', image: 'docker:stable-git', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'dotnet', image: 'microsoft/aspnetcore-build:2.0', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'cloudio', image: 'vlesierse/cloudio-cli:0.1.0', ttyEnabled: true, command: 'cat')
+    containerTemplate(name: 'cloudio', image: 'vlesierse/cloudio-cli:0.1.0', ttyEnabled: true, command: 'cat',
+      envVars: [ envVar(key: 'VAMP_HOST', value: 'http://vamp.default:8080') ])
   ],
   volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
   ) {
