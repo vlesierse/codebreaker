@@ -14,25 +14,28 @@ podTemplate(label: 'kubernetes',
     stage('Build & Test .NET Application') {
       container('dotnet') {
         sh "dotnet restore"
-        //sh "dotnet test test/**/*.csproj"
-        //sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
+        sh "dotnet test test/**/*.csproj"
+        sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
       }
     }
-    /*stage('Build & Publish Docker image') {
+    stage('Build & Publish Docker image') {
       container('docker') {
         docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
           sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
           def image = docker.image("codebreaker:${shortCommit}")
           image.push()
-          image.push('latest')
+          // Only push latest on master
+          if (env.BRANCH_NAME == 'master') {
+            image.push('latest')
+          }
         }
       }
-    }*/
-    stage('Deploy') {
-      if (env.BRANCH_NAME == 'master') {
-          echo 'I only execute on the master branch'
-      } else {
-          echo 'I execute elsewhere'
+    }
+    if (env.BRANCH_NAME == 'master') {
+      stage('Deploy') {
+        container('cloudio') {
+          sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
+        }
       }
     }
   }
