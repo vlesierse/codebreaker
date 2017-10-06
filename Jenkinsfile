@@ -29,14 +29,10 @@ podTemplate(label: 'kubernetes',
       }
     }*/
     stage('Deploy') {
-      when { branch 'master' }
-      steps {
-        echo 'This stage will be skiped'
-      }
-    }
-    stage('Deploy') {
-      steps {
-        echo 'This stage will be executed.'
+      if (env.BRANCH_NAME == 'master') {
+          echo 'I only execute on the master branch'
+      } else {
+          echo 'I execute elsewhere'
       }
     }
   }
