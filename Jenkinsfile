@@ -29,9 +29,10 @@ podTemplate(label: 'kubernetes',
       }
     }
     stage('Deploy application') {
+      when { branch 'master' }
       container('cloudio') {
-        sh 'cloudio --version'
-        //sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
+        //sh 'cloudio --version'
+        sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
       }
     }
   }
