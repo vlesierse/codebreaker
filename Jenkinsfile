@@ -31,10 +31,7 @@ podTemplate(label: 'kubernetes',
     stage('Deploy application') {
       when { branch 'master' }
       steps {
-        container('cloudio') {
-          sh 'cloudio --version'
-          //sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
-        }
+        echo 'This stage will be executed first.'
       }
     }
   }
