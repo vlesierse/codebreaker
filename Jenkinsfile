@@ -19,7 +19,6 @@ podTemplate(label: 'docker',
       }
     }
     stage('Build Docker image') {
-      when { branch 'master' }
       container('docker') {
         docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
           sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
@@ -30,9 +29,9 @@ podTemplate(label: 'docker',
       }
     }
     stage('Deploy application') {
-      when { branch 'master' }
       container('cloudio') {
-        sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
+        sh 'cloudio --version'
+        //sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
       }
     }
   }
