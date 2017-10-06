@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Container, Button } from 'semantic-ui-react'
+import { Container, Button, Grid, Header } from 'semantic-ui-react'
 import { actionCreators } from '../store';
 
 import CodePanel from './CodePanel';
 import ScorePanel from './ScorePanel';
 import AttemptList from './AttemptList';
-
+import HighScoreList from './HighScoreList';
 class Game extends React.Component {
     constructor(props) {
         super(props);
@@ -17,19 +17,36 @@ class Game extends React.Component {
     handleStartGame = () => {
         this.props.startGame();
     }
+    handleRegisterScore = name => {
+        this.props.registerScore(name);
+    }
+    componentDidMount() {
+        this.props.loadScores();
+    }
     render() {
         let startView = (<Container>
+            <Header as="h2">Welcome to Code Breaker</Header>
             <Button onClick={this.handleStartGame}>Start Game</Button>
+            <HighScoreList scores={this.props.scores} />
         </Container>);
         let gameView = (<Container>
             <CodePanel onCodeEnter={this.handleCodeEnter} digits={this.props.options.digits} minValue={this.props.options.minValue} maxValue={this.props.options.maxValue} />
             <AttemptList attempts={this.props.attempts} />
         </Container>);
         let finishedGame = (<Container>
-            <ScorePanel score={this.props.score}/>
+            {this.props.isScoreRegistered ? <Header as="h2">Welcome to Code Breaker</Header> : <ScorePanel score={this.props.score} registerScore={this.handleRegisterScore} />}
             <Button onClick={this.handleStartGame}>Start Game</Button>
         </Container>);
-        return this.props.id ? (this.props.score ? finishedGame : gameView) : startView;
+        return (<Grid>
+            <Grid.Row />
+            <Grid.Row>
+                <Grid.Column width="5" />
+                <Grid.Column width="6">
+                    {this.props.id ? (this.props.score ? finishedGame : gameView) : startView}
+                </Grid.Column>
+                <Grid.Column width="5" />
+            </Grid.Row>
+        </Grid>);
     }
 }
 

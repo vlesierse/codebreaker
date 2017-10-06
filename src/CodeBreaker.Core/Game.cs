@@ -28,7 +28,7 @@ namespace CodeBreaker.Core
             Attempts.Add(result);
             if (result.Correct) {
                 FinishedAt = DateTimeOffset.UtcNow;
-                Score = new Score(Id, Attempts.Count, Duration.Value);
+                Score = new Score(Id, (short)Attempts.Count, Duration.Value);
             }
             return result;
         }

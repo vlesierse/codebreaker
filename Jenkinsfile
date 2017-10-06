@@ -1,7 +1,7 @@
 podTemplate(label: 'docker',
   containers: [
     containerTemplate(name: 'docker', image: 'docker:stable-git', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'dotnet', image: 'microsoft/aspnetcore-build:2.0', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'dotnet', image: 'microsoft/aspnetcore-build:2.0', ttyEnabled: true, command: 'cat')
     containerTemplate(name: 'cloudio', image: 'vlesierse/cloudio-cli:0.1.0', ttyEnabled: true, command: 'cat')
   ],
   volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
@@ -18,25 +18,21 @@ podTemplate(label: 'docker',
         sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
       }
     }
-    stage('Build & Publish Docker image') {
+    stage('Build Docker image') {
       when { branch 'master' }
-      steps {
-        container('docker') {
-          docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
-            sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
-            def image = docker.image("codebreaker:${shortCommit}")
-            image.push()
-            image.push('latest')
-          }
+      container('docker') {
+        docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
+          sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
+          def image = docker.image("codebreaker:${shortCommit}")
+          image.push()
+          image.push('latest')
         }
       }
     }
     stage('Deploy application') {
       when { branch 'master' }
-      steps {
-        container('cloudio') {
-          sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
-        }
+      container('cloudio') {
+        sh "cloudio deploy codebreaker codebreaker:${shortCommit} --cluster codebreaker --breed codebreaker --deployable codebreaker.azurecr.io/codebreaker:${shortCommit}"
       }
     }
   }

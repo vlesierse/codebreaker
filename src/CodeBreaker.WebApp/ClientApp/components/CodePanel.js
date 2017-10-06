@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Form } from 'semantic-ui-react'
+import { Button, Form, Header } from 'semantic-ui-react'
 
 import CodeDigit from './CodeDigit';
 
@@ -25,6 +25,9 @@ export default class CodePanel extends React.Component {
     render() {
         return (
         <Form>
+            <Form.Group>
+                <Header as='h2'>Guess the code</Header>
+            </Form.Group>
             <Form.Group widths='equal'>
                 {this.state.code.map((d, i) => (<CodeDigit id={i} key={i} digit={d} onChange={this.handleDigitChanged} />))}
                 <Button circular icon='play' color='green' onClick={this.handleEnterCode} disabled={!this.state.isValid} />

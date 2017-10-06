@@ -89,7 +89,7 @@ namespace CodeBreaker.Core
             var random = new Random();
             for(int i = 0; i < digits; i++)
             {
-                code[i] = random.Next(minValue, maxValue);
+                code[i] = random.Next(minValue, maxValue + 1);
             }
             return new Code(code);
         }
