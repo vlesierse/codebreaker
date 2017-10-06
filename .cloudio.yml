@@ -1,0 +1,21 @@
+vamp:
+  blueprint:
+    name: codebreaker
+    clusters:
+      codebreaker:
+        services:
+        - breed:
+            name: codebreaker
+            deployable: codebreaker.azurecr.io/codebreaker
+            ports:
+              web: 80/http
+          scale:
+            cpu: 0.2
+            memory: 64MB
+            instances: 1
+  gateway:
+    name: codebreaker
+    port: 9060/http
+    routes:
+      codebreaker/codebreaker/web:
+        weight: 100%

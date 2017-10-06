@@ -4,7 +4,7 @@ namespace CodeBreaker.Core
     {
         public static GameOptions Default = new GameOptions();
         
-        public int Positions { get; set; } = 4;
+        public int Digits { get; set; } = 4;
         public int MinValue { get; set; } = 1;
         public int MaxValue { get; set; } = 5;
     }

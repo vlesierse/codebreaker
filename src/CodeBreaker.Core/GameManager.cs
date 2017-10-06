@@ -15,8 +15,8 @@ namespace CodeBreaker.Core
         public Game NewGame(GameOptions options)
         {
             // Generate code
-            var code = Code.Generate(options.Positions, options.MinValue, options.MaxValue);
-            return _store.AddGame(new Game(code));
+            var code = Code.Generate(options.Digits, options.MinValue, options.MaxValue);
+            return _store.AddGame(new Game(options));
         }
 
         public Game LoadGame(Guid id)
