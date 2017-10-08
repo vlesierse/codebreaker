@@ -9,6 +9,8 @@ vamp:
             deployable: codebreaker.azurecr.io/codebreaker
             ports:
               web: 80/http
+            env:
+              ConnectionStrings__DefaultConnection: {{{SQLSERVER_CONNECTIONSTRING}}}
           scale:
             cpu: 0.2
             memory: 64MB

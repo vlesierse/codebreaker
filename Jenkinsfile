@@ -3,7 +3,10 @@ podTemplate(label: 'kubernetes',
     containerTemplate(name: 'docker', image: 'docker:stable-git', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'dotnet', image: 'microsoft/aspnetcore-build:2.0', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'cloudio', image: 'vlesierse/cloudio-cli:0.1.0', ttyEnabled: true, command: 'cat',
-      envVars: [ envVar(key: 'VAMP_HOST', value: 'http://vamp.default:8080') ])
+      envVars: [
+        envVar(key: 'VAMP_HOST', value: 'http://vamp.default:8080'),
+        secretEnvVar(key: 'SQLSERVER_CONNECTIONSTRING', secretName: 'codebreaker', secretKey: 'connectionstring')
+      ])
   ],
   volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
   ) {
@@ -16,17 +19,18 @@ podTemplate(label: 'kubernetes',
       container('dotnet') {
         sh "dotnet restore"
         sh "dotnet test test/**/*.csproj"
-        sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
+        if (env.BRANCH_NAME == 'master') {
+          sh "dotnet publish -o ./out/ -c Release --self-contained -r linux-x64"
+        }
       }
     }
-    stage('Build & Publish Docker image') {
-      container('docker') {
-        docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
-          sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
-          def image = docker.image("codebreaker:${shortCommit}")
-          image.push()
-          // Only push latest on master
-          if (env.BRANCH_NAME == 'master') {
+    if (env.BRANCH_NAME == 'master') {
+      stage('Build & Publish Docker image') {
+        container('docker') {
+          docker.withRegistry('https://codebreaker.azurecr.io', 'codebreaker.azurecr.io') {
+            sh "docker build -t codebreaker:${shortCommit} src/CodeBreaker.WebApp"
+            def image = docker.image("codebreaker:${shortCommit}")
+            image.push()
             image.push('latest')
           }
         }
