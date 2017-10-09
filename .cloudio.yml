@@ -1,5 +1,10 @@
 deployment:
+  timeout: 30
   strategy:
+    name: canary
+    step: 25
+    duration: 15
+    timeout: 120
     metric:
       name: responseTime
       expression: < 2000
