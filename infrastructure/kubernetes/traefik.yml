@@ -1,0 +1,104 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: traefik-acme
+  namespace: kube-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-conf
+  namespace: kube-system
+data:
+  traefik.toml: |
+    defaultEntryPoints = ["http","https"]
+    [kubernetes]
+    [entryPoints]
+      [entryPoints.http]
+      address = ":80"
+        [entryPoints.http.redirect]
+        entryPoint = "https"
+      [entryPoints.https]
+      address = ":443"
+        [entryPoints.https.tls]
+    [acme]
+    email = "xyz@exact.com"
+    storage = "/acme/acme.json"
+    entryPoint = "https"
+    acmeLogging = true
+    # caServer = "https://acme-staging.api.letsencrypt.org/directory"
+    onDemand = true
+    onHostRule = true
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    name: http
+  - port: 443
+    name: https
+  selector:
+    k8s-app: traefik-ingress-lb
+
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - name: config
+        configMap:
+          name: traefik-conf
+      - name: acme
+        persistentVolumeClaim:
+          claimName: traefik-acme
+      containers:
+      - image: traefik:v1.3.1-alpine
+        name: traefik-ingress-lb
+        resources:
+          limits:
+            cpu: 200m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /acme
+          name: acme
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        args:
+        - --configfile=/config/traefik.toml
+        - --kubernetes

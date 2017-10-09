@@ -1,0 +1,66 @@
+Master:
+  Name: jenkins-master
+  Image: "jenkins/jenkins"
+  ImageTag: "alpine"
+  ImagePullPolicy: "Always"
+  Component: "jenkins-master"
+  UseSecurity: true
+  AdminUser: admin
+  Cpu: "200m"
+  Memory: "256Mi"
+  ServicePort: 8080
+  ServiceType: ClusterIP
+  ServiceAnnotations: {}
+  HostName: ci.codebreaker.lesierse.com
+  ContainerPort: 8080
+  SlaveListenerPort: 50000
+  LoadBalancerSourceRanges:
+  - 0.0.0.0/0
+  InstallPlugins:
+      - kubernetes:1.0
+      - workflow-aggregator:2.5
+      - workflow-job:2.13
+      - credentials-binding:1.13
+      - git:3.5.1
+      - blueocean:1.2.4
+      - github-oauth:2.7.1
+  InitScripts:
+  CustomConfigMap: false
+  NodeSelector: {}
+  Tolerations: {}
+  Ingress:
+    Annotations:
+    TLS:
+
+Agent:
+  Enabled: true
+  Image: jenkins/jnlp-slave
+  ImageTag: alpine
+  Component: "jenkins-slave"
+  Privileged: false
+  Cpu: "200m"
+  Memory: "256Mi"
+  AlwaysPullImage: false
+  volumes:
+  # - type: Secret
+  #   secretName: mysecret
+  #   mountPath: /var/myapp/mysecret
+  NodeSelector: {}
+
+Persistence:
+  Enabled: true
+  AccessMode: ReadWriteOnce
+  Size: 8Gi
+  volumes:
+  mounts:
+
+NetworkPolicy:
+  Enabled: false
+  ApiVersion: extensions/v1beta1
+
+## Install Default RBAC roles and bindings
+rbac:
+  install: false
+  serviceAccountName: default
+  apiVersion: v1beta1
+  roleRef: cluster-admin

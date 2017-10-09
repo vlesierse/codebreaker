@@ -1,0 +1,205 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vamp-conf
+data:
+  application.conf: |
+    vamp_url = "http://vamp:8080"
+    vamp_db_url = ${?VAMP_DB_URL}
+    vamp_db_name = "vamp-${namespace}"
+    vamp_db_name = ${?VAMP_DB_NAME}
+    vamp_db_user = ${?VAMP_DB_USER}
+    vamp_db_password = ${?VAMP_DB_PASSWORD}
+    vamp {
+      namespace = "default"
+      persistence {
+        database {
+          type = "sqlserver"
+          sql {
+            url = ${vamp_db_url}";database="${vamp_db_name}
+            user = ${vamp_db_user}
+            password = ${vamp_db_password}
+          }
+        }
+        key-value-store {
+          type = "etcd"
+          etcd.url = "http://etcd-client:2379"
+        }
+      }
+      container-driver {
+        type = "kubernetes"
+        kubernetes {
+          url = "https://kubernetes:443"
+          service-type = "NodePort"
+        }
+      }
+      http-api.ui {
+        directory = "/usr/local/vamp/ui"
+        index = ${vamp.http-api.ui.directory}"/index.html"
+      }
+      workflow-driver {
+        type = "kubernetes"
+        workflow {
+          deployables = [
+            {
+              type = "application/javascript"
+              breed = "vamp-workflow-javascript"
+            }
+          ]
+          scale {
+            instances = 1
+            cpu = 0.1
+            memory = 128MB
+          }
+          vamp-url = ${vamp_url}
+          vamp-key-value-store-path = "/vamp/"${vamp.namespace}"/workflows/${workflow}/value"
+          vamp-key-value-store-type = "etcd"
+          vamp-vamp-key-value-store-connection = ${vamp.persistence.key-value-store.etcd.url}
+          vamp-workflow-execution-period = 60
+          vamp-workflow-execution-timeout = 10
+          vamp-elasticsearch-url = ${vamp.pulse.elasticsearch.url}
+        }
+      }
+      pulse {
+        type = "elasticsearch"
+        elasticsearch.url = "http://elasticsearch:9200"
+      }
+      gateway-driver {
+        elasticsearch.metrics {
+          index = "vamp-vga-*"
+          type = "log"
+        }
+        marshallers = [
+          {
+            type = "haproxy"
+            name = "1.7"
+            template {
+              resource = "/io/vamp/gateway_driver/haproxy/template.twig"
+            }
+          }
+        ]
+      }
+      operation {
+        synchronization {
+          period = 3 seconds
+          check {
+            cpu = true
+            memory = true
+            instances = true
+            health-checks = true
+          }
+        }
+        deployment {
+          scale {
+            instances = 1
+            cpu = 0.2
+            memory = 256MB
+          }
+          arguments = [
+            "privileged=true"
+          ]
+        }
+      }
+      lifter {
+        pulse.enabled = true
+        persistence.enabled = true
+        sql {
+          connection {
+            table-url = ${vamp_db_url}";database="${vamp_db_name}
+            database-url = ${vamp_db_url}
+          }
+          database = ${vamp_db_name}
+          user = ${vamp_db_user}
+          password = ${vamp_db_password}
+        }
+        artifact {
+          enabled = true
+          force = true
+          files = [
+            "/usr/local/vamp/artifacts/breeds/vamp-workflow-javascript.yml"
+            "/usr/local/vamp/artifacts/breeds/health.js"
+            "/usr/local/vamp/artifacts/breeds/metrics.js"
+            "/usr/local/vamp/artifacts/breeds/allocation.js"
+            "/usr/local/vamp/artifacts/breeds/kibana.js"
+            "/usr/local/vamp/artifacts/workflows/health.yml"
+            "/usr/local/vamp/artifacts/workflows/metrics.yml"
+            "/usr/local/vamp/artifacts/workflows/allocation.yml"
+            "/usr/local/vamp/artifacts/workflows/kibana.yml"
+          ]
+        }
+      }
+    }
+    akka.ssl-config.trustManager.stores = [
+      {
+        type = "PEM"
+        path = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      }
+    ]
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: vamp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.vamp: vamp
+    spec:
+      volumes:
+      - name: config
+        configMap:
+          name: vamp-conf
+      containers:
+      - name: vamp
+        image: magneticio/vamp:0.9.5-kubernetes
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /usr/local/vamp/conf
+          name: config
+        env:
+        - name: VAMP_DB_URL
+          value: jdbc:sqlserver://codebreakerprod.database.windows.net:1433
+        - name: VAMP_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: vamp-persistence
+              key: username
+        - name: VAMP_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vamp-persistence
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vamp
+  labels:
+    io.vamp: vamp
+spec:
+  selector:
+    io.vamp: vamp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: vamp
+  annotations:
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-secret: basic-auth
+spec:
+  rules:
+  - host: vamp.codebreaker.lesierse.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: vamp
+          servicePort: 8080
