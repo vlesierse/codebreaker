@@ -2,8 +2,8 @@ deployment:
   timeout: 30
   strategy:
     name: canary
-    step: 50
-    period: 60
+    step: 25
+    period: 30
     timeout: 180
     metric:
       name: responseTime
