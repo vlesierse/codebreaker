@@ -1,6 +1,7 @@
 FROM microsoft/aspnetcore:2.0
 
 WORKDIR /app
-COPY ./out/ /app
+COPY ./out/ .
+COPY start.sh .
 
-ENTRYPOINT ["dotnet", "CodeBreaker.WebApp.dll"]
+ENTRYPOINT ["./start.sh"]

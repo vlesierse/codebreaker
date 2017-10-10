@@ -27,7 +27,7 @@ class Game extends React.Component {
         let startView = (<Container>
             <Header as="h2">Welcome to Code Breaker</Header>
             <Button onClick={this.handleStartGame}>Start Game</Button>
-            <HighScoreList scores={this.props.scores} />
+            {/*<HighScoreList scores={this.props.scores} />*/}
         </Container>);
         let gameView = (<Container>
             <CodePanel onCodeEnter={this.handleCodeEnter} digits={this.props.options.digits} minValue={this.props.options.minValue} maxValue={this.props.options.maxValue} />
