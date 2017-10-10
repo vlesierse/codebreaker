@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CodeBreaker.Core;
 using CodeBreaker.Core.Storage;
@@ -21,9 +22,11 @@ namespace CodeBreaker.WebApp.Controllers
             _scoreStore = scoreStore;
         }
 
+        [HttpGet]
         public async Task<IActionResult> ListScores(int page = 0, int size = 10)
         {
-            return Ok(await _scoreStore.GetScores(page, size));
+            //return Ok(await _scoreStore.GetScores(page, size));
+            return Ok(Enumerable.Empty<Score>());
         }
         
         [HttpPut("{id}")]
