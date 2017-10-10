@@ -21,7 +21,7 @@ class Game extends React.Component {
         this.props.registerScore(name);
     }
     componentDidMount() {
-        this.props.loadScores();
+        //this.props.loadScores();
     }
     render() {
         let startView = (<Container>
