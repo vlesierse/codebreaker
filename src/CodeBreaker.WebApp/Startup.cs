@@ -64,6 +64,9 @@ namespace CodeBreaker.WebApp
             }
 
             app.UseStaticFiles();
+
+            app.Map("/bam", err => err.Run(context => throw new Exception("BAM!!!")));
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
