@@ -6,7 +6,7 @@ warm_up()
     curl -s http://localhost:5000 > /dev/null
     while [ $? -ne 0 ]; do
         echo "Warm up"
-        curl -s http://localhost:5000/api/scores > /dev/null
+        curl -s http://localhost:5000 > /dev/null
         sleep 2s
     done
 }
