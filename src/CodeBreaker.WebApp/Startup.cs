@@ -64,10 +64,6 @@ namespace CodeBreaker.WebApp
             }
 
             app.UseStaticFiles();
-
-            // Dead man switch for demo purpose
-            //app.Map("/bam", err => err.Run(context => throw new Exception("BAM!!!")));
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
