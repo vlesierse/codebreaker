@@ -5,9 +5,6 @@ deployment:
     step: 10
     period: 6
     timeout: 120
-    metric:
-      name: responseTime
-      expression: < 2000
 vamp:
   blueprint:
     name: codebreaker
