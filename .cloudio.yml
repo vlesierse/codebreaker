@@ -5,6 +5,7 @@ deployment:
     step: 10
     period: 6
     timeout: 120
+    metric:
 vamp:
   blueprint:
     name: codebreaker
