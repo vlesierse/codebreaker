@@ -16,13 +16,13 @@ namespace CodeBreaker.WebApp.Storage
             _dbContext = dbContext;
         }
 
-        public async Task<Score[]> GetScores(int page, int size)
+        public Task<Score[]> GetScores(int page, int size)
         {
-            return (await _dbContext.Scores.ToListAsync())
+            return _dbContext.Scores
                 .OrderBy(s => s.Attempts)
                 .ThenBy(s => s.Duration)
                 .Skip(page * size).Take(size)
-                .ToArray();
+                .ToArrayAsync();
         }
 
         public async Task SaveScore(Score score)
