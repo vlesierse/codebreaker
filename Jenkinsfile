@@ -2,6 +2,11 @@ podTemplate(label: 'kubernetes',
   containers: [
     containerTemplate(name: 'docker', image: 'docker:stable-git', ttyEnabled: true, command: 'cat')
   ],
+  nodeSelector: 'kubernetes.io/role=agent,beta.kubernetes.io/os=linux,type=virtual-kubelet',
+  tolerations: [
+    'key=virtual-kubelet.io/provider,operator=Exists',
+    'key=azure.com/aci/provider,effect=NoSchedule'
+  ],
   volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
   ) {
 
