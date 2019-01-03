@@ -10,17 +10,17 @@ spec:
       - name: dockersock
         mountPath: "/var/run/docker.sock"
   volumes:
-      - name: dockersock
-        hostPath:
-          path: /var/run/docker.sock
-  dnsPolicy: ClusterFirst
-  nodeSelector:
-    kubernetes.io/role: agent
-    beta.kubernetes.io/os: linux
-    type: virtual-kubelet
-  tolerations:
-  - key: virtual-kubelet.io/provider
-    operator: Exists
-  - key: azure.com/aci
-    effect: NoSchedule
+  - name: dockersock
+    hostPath:
+      path: /var/run/docker.sock
+  #dnsPolicy: ClusterFirst
+  #nodeSelector:
+  #  kubernetes.io/role: agent
+  #  beta.kubernetes.io/os: linux
+  #  type: virtual-kubelet
+  #tolerations:
+  #- key: virtual-kubelet.io/provider
+  #  operator: Exists
+  #- key: azure.com/aci
+  #  effect: NoSchedule
 
