@@ -9,6 +9,10 @@ spec:
     volumeMounts:
       - name: dockersock
         mountPath: "/var/run/docker.sock"
+  - name: vamp-cli-ee
+    image: vlesierse/vamp-cli-ee:latest
+    command: ["cat"]
+    tty: true
   volumes:
   - name: dockersock
     hostPath:
